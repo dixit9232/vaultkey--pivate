@@ -1,0 +1,79 @@
+{
+  "@@locale": "en",
+  "appName": "VaultKey",
+  "@appName": {
+    "description": "Application name"
+  },
+  "appTagline": "Secure Your Digital Identity",
+  "@appTagline": {
+    "description": "Application tagline"
+  },
+  
+  "ok": "OK",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "add": "Add",
+  "done": "Done",
+  "next": "Next",
+  "back": "Back",
+  "close": "Close",
+  "retry": "Retry",
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "warning": "Warning",
+  "info": "Info",
+  
+  "signIn": "Sign In",
+  "signUp": "Sign Up",
+  "signOut": "Sign Out",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "forgotPassword": "Forgot Password?",
+  "createAccount": "Create Account",
+  "alreadyHaveAccount": "Already have an account?",
+  "dontHaveAccount": "Don't have an account?",
+  
+  "emailRequired": "Email is required",
+  "passwordRequired": "Password is required",
+  "invalidEmail": "Please enter a valid email address",
+  "passwordTooShort": "Password must be at least 8 characters",
+  "passwordsDoNotMatch": "Passwords do not match",
+  
+  "biometricPromptTitle": "Authenticate",
+  "biometricPromptSubtitle": "Use biometric to access VaultKey",
+  "biometricPromptCancel": "Cancel",
+  
+  "copyCode": "Copy Code",
+  "codeCopied": "Code copied to clipboard",
+  "addAuthenticator": "Add Authenticator",
+  "scanQRCode": "Scan QR Code",
+  "enterManually": "Enter Manually",
+  "noAuthenticators": "No authenticators yet",
+  "noAuthenticatorsMessage": "Add your first authenticator to get started",
+  
+  "issuer": "Issuer",
+  "accountName": "Account Name",
+  "secretKey": "Secret Key",
+  
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "security": "Security",
+  "backup": "Backup & Sync",
+  "about": "About",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "systemDefault": "System Default",
+  
+  "enableBiometric": "Enable Biometric",
+  "autoLock": "Auto Lock",
+  "clearClipboard": "Clear Clipboard",
+  "clearClipboardDescription": "Automatically clear copied codes after 30 seconds",
+  
+  "networkError": "No internet connection. Please check your network.",
+  "serverError": "Something went wrong. Please try again.",
+  "unknownError": "An unknown error occurred."
+}
