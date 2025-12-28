@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "235037268342",
+    "project_id": "vaultkey-616bf",
+    "storage_bucket": "vaultkey-616bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235037268342:android:00e2c0e99515d66f1a0257",
+        "android_client_info": {
+          "package_name": "com.example.vaultkey"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3ufFT203aVwkLZwzW0cJzjI4Ohj-CwIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
