@@ -4,9 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vaultkey/l10n/generated/app_localizations.dart';
 
-import 'core/config/app_config.dart';
+import 'core/config/environment.dart';
 import 'core/constants/app_strings.dart';
 import 'core/services/injection_container.dart';
 import 'core/theme/dark_theme.dart';
@@ -21,17 +22,24 @@ const List<String> rtlLanguages = ['ar', 'he', 'fa', 'ps', 'ur', 'ug'];
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize environment configuration from build-time config
+  // Use: flutter run --dart-define=ENVIRONMENT=production
+  EnvironmentConfig.initFromBuildConfig();
+
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark, systemNavigationBarColor: Colors.transparent, systemNavigationBarIconBrightness: Brightness.dark));
 
-  // Initialize Firebase
+  // Initialize Firebase (Primary Backend)
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize Crashlytics (only in production)
-  if (!kDebugMode) {
+  // Initialize Supabase (Secondary Backend)
+  await Supabase.initialize(url: SupabaseOptions.supabaseUrl, anonKey: SupabaseOptions.supabaseAnonKey);
+
+  // Initialize Crashlytics (only in release mode and production environment)
+  if (kReleaseMode && EnvironmentConfig.enableCrashlytics) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -41,9 +49,6 @@ void main() async {
 
   // Initialize dependencies
   await initDependencies();
-
-  // Set environment (default to development)
-  ConfigProvider.setEnvironment(Environment.development);
 
   runApp(const VaultKeyApp());
 }

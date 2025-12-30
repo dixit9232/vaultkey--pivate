@@ -33,6 +33,7 @@ class UserModel extends UserEntity {
   }
 
   /// Create copy with updated fields
+  @override
   UserModel copyWith({String? id, String? email, String? displayName, String? photoUrl, bool? emailVerified, DateTime? createdAt, DateTime? lastLoginAt}) {
     return UserModel(id: id ?? this.id, email: email ?? this.email, displayName: displayName ?? this.displayName, photoUrl: photoUrl ?? this.photoUrl, emailVerified: emailVerified ?? this.emailVerified, createdAt: createdAt ?? this.createdAt, lastLoginAt: lastLoginAt ?? this.lastLoginAt);
   }

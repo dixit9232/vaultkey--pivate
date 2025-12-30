@@ -41,7 +41,7 @@ class LocalDataSourceImpl implements LocalDataSource {
     : _secureStorage =
           secureStorage ??
           const FlutterSecureStorage(
-            aOptions: AndroidOptions(encryptedSharedPreferences: true),
+            aOptions: AndroidOptions(),
             iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
           );
 

@@ -14,17 +14,29 @@ abstract class FirebaseDataSource {
   /// Check if user is authenticated
   bool get isAuthenticated;
 
+  /// Stream of auth state changes
+  Stream<User?> get authStateChanges;
+
   /// Sign in with email and password
   Future<UserCredential> signInWithEmailAndPassword({required String email, required String password});
 
   /// Create user with email and password
   Future<UserCredential> createUserWithEmailAndPassword({required String email, required String password});
 
+  /// Sign in with OAuth credential (Google, Microsoft, etc.)
+  Future<UserCredential> signInWithCredential(AuthCredential credential);
+
   /// Sign out
   Future<void> signOut();
 
   /// Send password reset email
   Future<void> sendPasswordResetEmail(String email);
+
+  /// Send email verification to current user
+  Future<void> sendEmailVerification();
+
+  /// Reload current user to refresh data
+  Future<void> reloadUser();
 
   /// Get Firestore collection reference
   CollectionReference<Map<String, dynamic>> getCollection(String path);
@@ -57,6 +69,9 @@ class FirebaseDataSourceImpl implements FirebaseDataSource {
   bool get isAuthenticated => _auth.currentUser != null;
 
   @override
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  @override
   Future<UserCredential> signInWithEmailAndPassword({required String email, required String password}) async {
     try {
       return await _auth.signInWithEmailAndPassword(email: email, password: password);
@@ -70,11 +85,25 @@ class FirebaseDataSourceImpl implements FirebaseDataSource {
   @override
   Future<UserCredential> createUserWithEmailAndPassword({required String email, required String password}) async {
     try {
-      return await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      // Send email verification after account creation
+      await credential.user?.sendEmailVerification();
+      return credential;
     } on FirebaseAuthException catch (e) {
       throw AuthException(message: e.message ?? 'Registration failed', code: e.code);
     } catch (e) {
       throw ServerException(message: 'Registration failed: $e');
+    }
+  }
+
+  @override
+  Future<UserCredential> signInWithCredential(AuthCredential credential) async {
+    try {
+      return await _auth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(message: e.message ?? 'Authentication failed', code: e.code);
+    } catch (e) {
+      throw ServerException(message: 'Sign in failed: $e');
     }
   }
 
@@ -95,6 +124,31 @@ class FirebaseDataSourceImpl implements FirebaseDataSource {
       throw AuthException(message: e.message ?? 'Failed to send reset email', code: e.code);
     } catch (e) {
       throw ServerException(message: 'Failed to send password reset email: $e');
+    }
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw const AuthException(message: 'No user signed in', code: 'NO_USER');
+      }
+      await user.sendEmailVerification();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(message: e.message ?? 'Failed to send verification email', code: e.code);
+    } catch (e) {
+      if (e is AuthException) rethrow;
+      throw ServerException(message: 'Failed to send verification email: $e');
+    }
+  }
+
+  @override
+  Future<void> reloadUser() async {
+    try {
+      await _auth.currentUser?.reload();
+    } catch (e) {
+      throw ServerException(message: 'Failed to reload user: $e');
     }
   }
 

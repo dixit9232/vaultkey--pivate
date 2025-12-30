@@ -1,90 +1,40 @@
-/// Environment configuration enum
-enum Environment { development, staging, production }
+import 'package:flutter/foundation.dart';
 
-/// App configuration based on environment
+import '../../firebase_options.dart';
+
+/// App configuration - Unified for all environments
+/// Uses the same Firebase and Supabase configuration across dev, profile, and production
 class AppConfig {
-  final Environment environment;
-  final String appName;
-  final String baseUrl;
-  final bool enableLogging;
-  final bool enableCrashlytics;
-  final bool enableAnalytics;
-  final bool enablePerformanceMonitoring;
+  /// App name
+  static const String appName = 'VaultKey';
 
-  const AppConfig._({
-    required this.environment,
-    required this.appName,
-    required this.baseUrl,
-    required this.enableLogging,
-    required this.enableCrashlytics,
-    required this.enableAnalytics,
-    required this.enablePerformanceMonitoring,
-  });
+  /// App package identifier
+  static const String appId = 'com.auth.vaultkey';
 
-  /// Development configuration
-  static const AppConfig development = AppConfig._(
-    environment: Environment.development,
-    appName: 'VaultKey Dev',
-    baseUrl: 'http://localhost:8080',
-    enableLogging: true,
-    enableCrashlytics: false,
-    enableAnalytics: false,
-    enablePerformanceMonitoring: false,
-  );
+  /// Supabase URL from centralized configuration
+  static String get supabaseBaseUrl => SupabaseOptions.supabaseUrl;
 
-  /// Staging configuration
-  static const AppConfig staging = AppConfig._(
-    environment: Environment.staging,
-    appName: 'VaultKey Staging',
-    baseUrl: 'https://staging-api.vaultkey.app',
-    enableLogging: true,
-    enableCrashlytics: true,
-    enableAnalytics: false,
-    enablePerformanceMonitoring: true,
-  );
+  /// Supabase anonymous key from centralized configuration
+  static String get supabaseAnonKey => SupabaseOptions.supabaseAnonKey;
 
-  /// Production configuration
-  static const AppConfig production = AppConfig._(
-    environment: Environment.production,
-    appName: 'VaultKey',
-    baseUrl: 'https://api.vaultkey.app',
-    enableLogging: false,
-    enableCrashlytics: true,
-    enableAnalytics: true,
-    enablePerformanceMonitoring: true,
-  );
+  /// Logging is enabled only in debug mode
+  static bool get enableLogging => kDebugMode;
 
-  /// Check if running in development
-  bool get isDevelopment => environment == Environment.development;
+  /// Crashlytics is enabled in release mode
+  static bool get enableCrashlytics => kReleaseMode;
 
-  /// Check if running in staging
-  bool get isStaging => environment == Environment.staging;
+  /// Analytics is enabled in release mode
+  static bool get enableAnalytics => kReleaseMode;
 
-  /// Check if running in production
-  bool get isProduction => environment == Environment.production;
-}
+  /// Performance monitoring is enabled in release and profile mode
+  static bool get enablePerformanceMonitoring => !kDebugMode;
 
-/// Global app configuration instance
-class ConfigProvider {
-  static AppConfig _config = AppConfig.development;
+  /// Check if running in debug mode
+  static bool get isDebugMode => kDebugMode;
 
-  static AppConfig get config => _config;
+  /// Check if running in profile mode
+  static bool get isProfileMode => kProfileMode;
 
-  static void setConfig(AppConfig config) {
-    _config = config;
-  }
-
-  static void setEnvironment(Environment environment) {
-    switch (environment) {
-      case Environment.development:
-        _config = AppConfig.development;
-        break;
-      case Environment.staging:
-        _config = AppConfig.staging;
-        break;
-      case Environment.production:
-        _config = AppConfig.production;
-        break;
-    }
-  }
+  /// Check if running in release mode
+  static bool get isReleaseMode => kReleaseMode;
 }

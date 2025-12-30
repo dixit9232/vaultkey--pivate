@@ -1,5 +1,6 @@
 /// Core module barrel file
 /// Export all core modules for easy importing
+library;
 
 export 'config/config.dart';
 export 'constants/constants.dart';

@@ -13,6 +13,7 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
   static const String verifyEmail = '/verify-email';
+  static const String emailVerification = '/email-verification';
 
   // Main app routes
   static const String authenticators = '/authenticators';
@@ -44,6 +45,7 @@ class RouteNames {
   static const String login = 'login';
   static const String register = 'register';
   static const String forgotPassword = 'forgotPassword';
+  static const String emailVerification = 'emailVerification';
   static const String authenticators = 'authenticators';
   static const String addAuthenticator = 'addAuthenticator';
   static const String scanQR = 'scanQR';

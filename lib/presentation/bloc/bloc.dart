@@ -1,20 +1,29 @@
-/// Presentation bloc barrel file
-/// Export all BLoC related files
+/// Barrel file for BLoC exports
+library;
 
-export 'base_event.dart';
-export 'base_state.dart';
+// Add Authenticator
+export 'add_authenticator/add_authenticator.dart';
 
-// Auth BLoC
-// export 'auth/auth_bloc.dart';
-// export 'auth/auth_event.dart';
-// export 'auth/auth_state.dart';
+// Auth
+export 'auth/auth.dart';
 
-// Authenticator BLoC
-// export 'authenticator/authenticator_bloc.dart';
-// export 'authenticator/authenticator_event.dart';
-// export 'authenticator/authenticator_state.dart';
+// Authenticator
+export 'authenticator/authenticator.dart';
 
-// Settings BLoC
-// export 'settings/settings_bloc.dart';
-// export 'settings/settings_event.dart';
-// export 'settings/settings_state.dart';
+// Backup
+export 'backup/backup.dart';
+
+// Onboarding
+export 'onboarding/onboarding.dart';
+
+// Scanner
+export 'scanner/scanner.dart';
+
+// Settings
+export 'settings/settings.dart';
+
+// Subscription
+export 'subscription/subscription.dart';
+
+// Theme
+export 'theme/theme.dart';

@@ -2,6 +2,8 @@ import 'package:fpdart/fpdart.dart';
 
 import '../../core/failures/exceptions.dart';
 import '../../core/failures/failures.dart';
+import '../../core/services/google_auth_service.dart';
+import '../../core/services/microsoft_auth_service.dart';
 import '../../core/services/network_info.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -14,10 +16,17 @@ class AuthRepositoryImpl implements AuthRepository {
   final FirebaseDataSource _remoteDataSource;
   final LocalDataSource _localDataSource;
   final NetworkInfo _networkInfo;
+  final GoogleAuthService _googleAuthService;
+  final MicrosoftAuthService _microsoftAuthService;
 
   static const String _userDataKey = 'user_data';
 
-  AuthRepositoryImpl({required FirebaseDataSource remoteDataSource, required LocalDataSource localDataSource, required NetworkInfo networkInfo}) : _remoteDataSource = remoteDataSource, _localDataSource = localDataSource, _networkInfo = networkInfo;
+  AuthRepositoryImpl({required FirebaseDataSource remoteDataSource, required LocalDataSource localDataSource, required NetworkInfo networkInfo, required GoogleAuthService googleAuthService, required MicrosoftAuthService microsoftAuthService})
+    : _remoteDataSource = remoteDataSource,
+      _localDataSource = localDataSource,
+      _networkInfo = networkInfo,
+      _googleAuthService = googleAuthService,
+      _microsoftAuthService = microsoftAuthService;
 
   @override
   Future<Either<Failure, UserEntity>> signInWithEmailAndPassword({required String email, required String password}) async {
@@ -117,4 +126,89 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   bool get isAuthenticated => _remoteDataSource.isAuthenticated;
+
+  @override
+  Future<Either<Failure, UserEntity>> signInWithGoogle() async {
+    if (!await _networkInfo.isConnected) {
+      return Left(const NetworkFailure());
+    }
+
+    try {
+      final credential = await _googleAuthService.signIn();
+      final userCredential = await _remoteDataSource.signInWithCredential(credential);
+
+      final user = userCredential.user;
+      if (user == null) {
+        return Left(const AuthFailure(message: 'Google sign-in failed'));
+      }
+
+      final userModel = UserModel(id: user.uid, email: user.email ?? '', displayName: user.displayName, photoUrl: user.photoURL, emailVerified: user.emailVerified, lastLoginAt: DateTime.now());
+
+      await _localDataSource.setSecureValue(_userDataKey, userModel.toJson().toString());
+
+      return Right(userModel.toEntity());
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message, code: e.code));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Google sign-in failed: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> signInWithMicrosoft() async {
+    if (!await _networkInfo.isConnected) {
+      return Left(const NetworkFailure());
+    }
+
+    try {
+      final credential = await _microsoftAuthService.signIn();
+      final userCredential = await _remoteDataSource.signInWithCredential(credential);
+
+      final user = userCredential.user;
+      if (user == null) {
+        return Left(const AuthFailure(message: 'Microsoft sign-in failed'));
+      }
+
+      final userModel = UserModel(id: user.uid, email: user.email ?? '', displayName: user.displayName, photoUrl: user.photoURL, emailVerified: user.emailVerified, lastLoginAt: DateTime.now());
+
+      await _localDataSource.setSecureValue(_userDataKey, userModel.toJson().toString());
+
+      return Right(userModel.toEntity());
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message, code: e.code));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Microsoft sign-in failed: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> sendEmailVerification() async {
+    try {
+      await _remoteDataSource.sendEmailVerification();
+      return const Right(null);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message, code: e.code));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Failed to send verification email: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> reloadUser() async {
+    try {
+      await _remoteDataSource.reloadUser();
+      final user = _remoteDataSource.currentUser;
+      return Right(user?.emailVerified ?? false);
+    } catch (e) {
+      return Left(ServerFailure(message: 'Failed to reload user: $e'));
+    }
+  }
+
+  @override
+  Stream<UserEntity?> get authStateChanges {
+    return _remoteDataSource.authStateChanges.map((user) {
+      if (user == null) return null;
+      return UserModel(id: user.uid, email: user.email ?? '', displayName: user.displayName, photoUrl: user.photoURL, emailVerified: user.emailVerified).toEntity();
+    });
+  }
 }

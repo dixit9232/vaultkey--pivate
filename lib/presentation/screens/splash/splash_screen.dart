@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../routes/app_routes.dart';
 
@@ -50,9 +52,24 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     // Wait for animations and initialization
     await Future.delayed(const Duration(milliseconds: 2500));
 
-    if (mounted) {
-      // TODO: Check authentication state and navigate accordingly
-      context.go(AppRoutes.home);
+    if (!mounted) return;
+
+    // Check if first launch
+    final prefs = await SharedPreferences.getInstance();
+    final isFirstLaunch = prefs.getBool(AppConstants.firstLaunchKey) ?? true;
+
+    if (!mounted) return;
+
+    if (isFirstLaunch) {
+      // Mark as not first launch anymore
+      await prefs.setBool(AppConstants.firstLaunchKey, false);
+      if (!mounted) return;
+      // Navigate to onboarding
+      context.go(AppRoutes.onboarding);
+    } else {
+      // TODO: Check authentication state
+      // For now, navigate to login
+      context.go(AppRoutes.login);
     }
   }
 
